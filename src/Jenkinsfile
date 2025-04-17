@@ -28,11 +28,12 @@ pipeline {
             }
         }
 
-       stage('Coverage') {
-           steps {
-               sh './mvnw verify'
-           }
-       }
+        stage('Coverage') {
+            steps {
+                // Exécution de verify pour déclencher jacoco:report via le pom.xml
+                sh './mvnw verify'
+            }
+        }
 
         stage('SonarQube Analysis') {
             steps {
