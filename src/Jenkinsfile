@@ -2,24 +2,25 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3' // défini dans Jenkins > Global Tool Configuration
+        maven 'Maven3'
     }
 
     environment {
-        SONARQUBE_ENV = 'SonarQube' // nom défini dans Jenkins > SonarQube servers
+        SONARQUBE_ENV = 'SonarQube'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/franckjourdain/ecf3-backend.git' // adapte si besoin
+                git 'https://github.com/franckjourdain/ecf3-backend.git'
             }
         }
 
         stage('Test & Coverage') {
             steps {
-                // Génère les tests + rapport Jacoco XML
-                sh './mvnw clean verify jacoco:report'
+                sh './mvnw clean verify'
+                //GÉNÉRATION FORCÉE du rapport XML après les tests
+                sh './mvnw jacoco:report'
             }
         }
 
