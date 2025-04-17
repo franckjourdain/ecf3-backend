@@ -30,15 +30,13 @@ pipeline {
 
         stage('Coverage') {
             steps {
-                // Exécution de verify pour déclencher jacoco:report via le pom.xml
-                sh './mvnw verify'
+                // Force explicit jacoco report generation
+                sh './mvnw jacoco:report'
+                // Optionnel : liste les fichiers générés
+                sh 'ls -l target/site/jacoco || echo "jacoco.xml non trouvé 😡"'
             }
         }
-        stage('Debug Jacoco') {
-            steps {
-                sh 'ls -al target/site/jacoco || echo "Pas de rapport trouvé"'
-            }
-        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
