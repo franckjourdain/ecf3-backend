@@ -28,14 +28,12 @@ pipeline {
             }
         }
 
-        stage('Coverage') {
-            steps {
-                // Force explicit jacoco report generation
-                sh './mvnw jacoco:report'
-                // Optionnel : liste les fichiers générés
-                sh 'ls -l target/site/jacoco || echo "jacoco.xml non trouvé 😡"'
-            }
-        }
+      stage('Coverage') {
+          steps {
+              sh './mvnw jacoco:report'
+              sh 'ls -la target/site/jacoco' // 👈 debug pour vérifier la génération du rapport
+          }
+      }
 
         stage('SonarQube Analysis') {
             steps {
