@@ -22,11 +22,10 @@ pipeline {
             }
         }
 
-        stage('Test & Coverage') {
+        stage('Test + Coverage') {
             steps {
-                // La phase verify lance les tests et génère le rapport jacoco.xml
-                sh './mvnw verify'
-                sh 'ls -la target/site/jacoco' // 👈 debug utile pour confirmer la génération
+                sh './mvnw verify' // ⚠️ cette étape génère le rapport jacoco.xml
+                sh 'ls -l target/site/jacoco' // Debug utile à conserver
             }
         }
 
