@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3' // à configurer dans Jenkins
+        maven 'Maven3'
     }
 
     environment {
-        SONARQUBE_ENV = 'SonarQube' // nom configuré dans Jenkins > SonarQube Servers
+        SONARQUBE_ENV = 'SonarQube'
     }
 
     stages {
@@ -30,7 +30,7 @@ pipeline {
 
         stage('Coverage') {
             steps {
-                sh './mvnw jacoco:report' // génère le fichier jacoco.xml
+                sh './mvnw jacoco:report'
             }
         }
 
