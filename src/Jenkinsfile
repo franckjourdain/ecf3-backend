@@ -22,18 +22,13 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Test & Coverage') {
             steps {
-                sh './mvnw test'
+                // La phase verify lance les tests et génère le rapport jacoco.xml
+                sh './mvnw verify'
+                sh 'ls -la target/site/jacoco' // 👈 debug utile pour confirmer la génération
             }
         }
-
-      stage('Coverage') {
-          steps {
-              sh './mvnw jacoco:report'
-              sh 'ls -la target/site/jacoco' // 👈 debug pour vérifier la génération du rapport
-          }
-      }
 
         stage('SonarQube Analysis') {
             steps {
