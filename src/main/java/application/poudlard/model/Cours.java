@@ -11,19 +11,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "cours")
 @Getter
 @Setter
 @NoArgsConstructor
 public class Cours {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_cours")
     private int idCours;
     private String intitule;
     private String ref;
     @ManyToOne
     private Etudiant professeur;
 
-    private boolean option;
+    @Column(name = "est_optionnel")
+    private boolean estOptionnel;
+
 
     @OneToMany(mappedBy = "cours")
     @JsonIgnore

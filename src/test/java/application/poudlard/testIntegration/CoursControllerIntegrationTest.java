@@ -18,6 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -29,6 +31,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+@Sql(scripts = "/data-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class CoursControllerIntegrationTest {
 
@@ -78,7 +82,6 @@ public class CoursControllerIntegrationTest {
 
     @Test
     void testGetAllCours_shouldReturnCoursList() throws Exception {
-        // 🔍 Vérifie si l'étudiant existe déjà
         Optional<Etudiant> optionalProf = etudiantDAO.findByEmail("prof@test.com");
         Etudiant prof = optionalProf.orElseGet(() -> {
             Etudiant p = new Etudiant();
@@ -94,7 +97,7 @@ public class CoursControllerIntegrationTest {
         cours.setIntitule("Biologie");
         cours.setRef("BIO");
         cours.setProfesseur(prof);
-        cours.setOption(false);
+        cours.setEstOptionnel(false);
         coursDAO.save(cours);
 
         mockMvc.perform(get("/poudlard/cours/all"))
@@ -105,7 +108,6 @@ public class CoursControllerIntegrationTest {
 
     @Test
     void testGetCoursById_shouldReturnSpecificCours() throws Exception {
-        // Créer ou réutiliser un professeur
         Etudiant prof = etudiantDAO.findByEmail("prof@test.com").orElseGet(() -> {
             Etudiant p = new Etudiant();
             p.setNom("Professeur");
@@ -116,12 +118,11 @@ public class CoursControllerIntegrationTest {
             return etudiantDAO.save(p);
         });
 
-        // Créer un cours
         Cours cours = new Cours();
         cours.setIntitule("Astronomie");
         cours.setRef("ASTRO");
         cours.setProfesseur(prof);
-        cours.setOption(false);
+        cours.setEstOptionnel(false);
         cours = coursDAO.save(cours);
 
         mockMvc.perform(get("/poudlard/cours/" + cours.getIdCours()))
@@ -129,10 +130,10 @@ public class CoursControllerIntegrationTest {
                 .andExpect(jsonPath("$.intitule").value("Astronomie"))
                 .andExpect(jsonPath("$.ref").value("ASTRO"));
     }
+
     @Test
     @WithMockUser(roles = "ADMIN")
     void testAjouterCours_shouldCreateNewCours() throws Exception {
-        // Créer ou récupérer un professeur
         Etudiant prof = etudiantDAO.findByEmail("prof2@test.com").orElseGet(() -> {
             Etudiant p = new Etudiant();
             p.setNom("Professeur2");
@@ -147,27 +148,25 @@ public class CoursControllerIntegrationTest {
         cours.setIntitule("Sortilèges");
         cours.setRef("SORT");
         cours.setProfesseur(prof);
-        cours.setOption(false);
+        cours.setEstOptionnel(false);
 
         mockMvc.perform(post("/poudlard/cours")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cours)))
                 .andExpect(status().isCreated());
 
-        // Vérifier que le cours a bien été sauvegardé
         List<Cours> coursList = coursDAO.findAll();
         assertThat(coursList).anyMatch(c -> c.getRef().equals("SORT") && c.getIntitule().equals("Sortilèges"));
     }
+
     @Test
     void testGetCoursById_shouldReturnCours() throws Exception {
-        // Créer un rôle PROFESSEUR si besoin
         Role roleProf = roleRepository.findByNom("PROFESSEUR").orElseGet(() -> {
             Role r = new Role();
             r.setNom("PROFESSEUR");
             return roleRepository.save(r);
         });
 
-        // Créer un professeur
         Etudiant prof = new Etudiant();
         prof.setNom("Snape");
         prof.setPrenom("Severus");
@@ -176,32 +175,29 @@ public class CoursControllerIntegrationTest {
         prof.setRole(roleProf);
         Etudiant savedProf = etudiantDAO.save(prof);
 
-        // Créer un cours
         Cours cours = new Cours();
         cours.setIntitule("Potions");
         cours.setRef("POT");
         cours.setProfesseur(savedProf);
-        cours.setOption(false);
+        cours.setEstOptionnel(false);
         Cours savedCours = coursDAO.save(cours);
 
-        // Test de récupération du cours par son ID
         mockMvc.perform(get("/poudlard/cours/" + savedCours.getIdCours()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.intitule").value("Potions"))
                 .andExpect(jsonPath("$.ref").value("POT"))
                 .andExpect(jsonPath("$.professeur.email").value("snape@poudlard.com"))
-                .andExpect(jsonPath("$.option").value(false));
+                .andExpect(jsonPath("$.estOptionnel").value(false));
     }
+
     @Test
     void testGetEtudiantsByCours_shouldReturnListOfEtudiants() throws Exception {
-        // Créer un rôle ETUDIANT si besoin
         Role roleEtudiant = roleRepository.findByNom("ETUDIANT").orElseGet(() -> {
             Role r = new Role();
             r.setNom("ETUDIANT");
             return roleRepository.save(r);
         });
 
-        // Créer des étudiants
         Etudiant etu1 = new Etudiant();
         etu1.setNom("Granger");
         etu1.setPrenom("Hermione");
@@ -219,7 +215,6 @@ public class CoursControllerIntegrationTest {
         etu1 = etudiantDAO.save(etu1);
         etu2 = etudiantDAO.save(etu2);
 
-        // Créer un professeur
         Role roleProf = roleRepository.findByNom("PROFESSEUR").orElseGet(() -> {
             Role r = new Role();
             r.setNom("PROFESSEUR");
@@ -234,27 +229,25 @@ public class CoursControllerIntegrationTest {
         prof.setRole(roleProf);
         prof = etudiantDAO.save(prof);
 
-        // Créer un cours
         Cours cours = new Cours();
         cours.setIntitule("Transfiguration");
         cours.setRef("TRANS");
         cours.setProfesseur(prof);
-        cours.setOption(false);
+        cours.setEstOptionnel(false);
         cours.getEtudiants().add(etu1);
         cours.getEtudiants().add(etu2);
         cours = coursDAO.save(cours);
 
-        // Vérifier les étudiants récupérés par l'endpoint
         mockMvc.perform(get("/poudlard/cours/" + cours.getIdCours() + "/etudiants"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].email").value("hermione@poudlard.com"))
                 .andExpect(jsonPath("$[1].email").value("ron@poudlard.com"));
     }
+
     @Test
     @WithMockUser(roles = "PROFESSEUR")
     void testGetNotesByCours_shouldReturnNotesList() throws Exception {
-        // Créer un professeur
         Role professeurRole = roleRepository.findByNom("PROFESSEUR")
                 .orElseGet(() -> roleRepository.save(new Role(null, "PROFESSEUR")));
 
@@ -266,41 +259,38 @@ public class CoursControllerIntegrationTest {
         prof.setRole(professeurRole);
         Etudiant savedProf = etudiantDAO.save(prof);
 
-        // Créer un cours associé au professeur
         Cours cours = new Cours();
         cours.setIntitule("Histoire");
         cours.setRef("HIST");
         cours.setProfesseur(savedProf);
-        cours.setOption(false);
+        cours.setEstOptionnel(false);
         Cours savedCours = coursDAO.save(cours);
 
-        // Créer un étudiant et une note
         Etudiant etu = new Etudiant();
         etu.setNom("Eleve");
         etu.setPrenom("Note");
         etu.setEmail("eleve@test.com");
         etu.setMotDePasse("test123");
-        etu.setRole(professeurRole); // Peu importe ici, on veut juste un étudiant en BDD
+        etu.setRole(professeurRole);
         Etudiant savedEtu = etudiantDAO.save(etu);
 
         Note note = new Note();
         note.setValeur(16.0);
         note.setCours(savedCours);
         note.setEtudiant(savedEtu);
-        noteDAO.save(note); // <-- Correction ici
+        noteDAO.save(note);
 
         mockMvc.perform(get("/poudlard/cours/" + savedCours.getIdCours() + "/notes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].valeur").value(16.0));
     }
+
     @Test
     @WithMockUser(roles = "PROFESSEUR")
     void testAjouterNoteAEtudiant_shouldCreateNote() throws Exception {
-        // Créer le rôle
         Role profRole = roleRepository.findByNom("PROFESSEUR")
                 .orElseGet(() -> roleRepository.save(new Role(null, "PROFESSEUR")));
 
-        // Créer un professeur
         Etudiant prof = new Etudiant();
         prof.setNom("Prof");
         prof.setPrenom("AjouterNote");
@@ -309,7 +299,6 @@ public class CoursControllerIntegrationTest {
         prof.setRole(profRole);
         Etudiant savedProf = etudiantDAO.save(prof);
 
-        // Créer un étudiant
         Etudiant etu = new Etudiant();
         etu.setNom("Etudiant");
         etu.setPrenom("Note");
@@ -318,20 +307,18 @@ public class CoursControllerIntegrationTest {
         etu.setRole(profRole);
         Etudiant savedEtu = etudiantDAO.save(etu);
 
-        // Créer un cours
         Cours cours = new Cours();
         cours.setIntitule("Philo");
         cours.setRef("PHI");
         cours.setProfesseur(savedProf);
-        cours.setOption(false);
+        cours.setEstOptionnel(false);
         Cours savedCours = coursDAO.save(cours);
 
-        // JSON de la note
         String noteJson = """
         {
             "valeur": 17.5
         }
-    """;
+        """;
 
         mockMvc.perform(post("/poudlard/cours/" + savedCours.getIdCours() + "/" + savedEtu.getIdEtudiant() + "/notes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -340,7 +327,4 @@ public class CoursControllerIntegrationTest {
                 .andExpect(jsonPath("$.valeur").value(17.5))
                 .andExpect(jsonPath("$.idNote").exists());
     }
-
-
-
 }

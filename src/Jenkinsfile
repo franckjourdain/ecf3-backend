@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven3' // défini dans Jenkins > Global Tool Configuration
+    }
+
+    environment {
+        SONARQUBE_ENV = 'SonarQube' // nom défini dans Jenkins > SonarQube servers
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/franckjourdain/ecf3-backend.git' // adapte si besoin
+            }
+        }
+
+        stage('Test & Coverage') {
+            steps {
+                sh './mvnw clean verify' // lance les tests + génère jacoco.xml
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh './mvnw sonar:sonar -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml'
+                }
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+}

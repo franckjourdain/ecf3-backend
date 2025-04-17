@@ -48,21 +48,15 @@ public class CoursService {
             Cours cours = new Cours();
             cours.setIntitule(intitule);
             cours.setRef(ref);
-            cours.setOption(option);
+            cours.setEstOptionnel(true);
             cours.setProfesseur(professeur);
             coursDao.save(cours);
         }
     }
-
     public void initialiserCours() {
-        ajouterCoursSiProfExiste("Français", "FR", "jean.dupont@poudlard.com", false);
-        ajouterCoursSiProfExiste("Mathematique", "MATH", "jeanne.micheline@poudlard.com", false);
-        ajouterCoursSiProfExiste("Anglais", "ANG", "mickael.smith@poudlard.com", false);
-        ajouterCoursSiProfExiste("Chimie", "CHIM", "eric.dufour@poudlard.com", false);
-        ajouterCoursSiProfExiste("Physique", "PHYS", "francois.abgrall@poudlard.com", false);
-        ajouterCoursSiProfExiste("Informatique", "INFO", "jam.cavarec@poudlard.com", false);
-        ajouterCoursSiProfExiste("Sport", "SP", "rene.tanguy@poudlard.com", true);
+        // Données initiales déplacées dans DataInitializer
     }
+
 
     private void ajouterCoursSiProfExiste(String nom, String code, String emailProf, boolean obligatoire) {
         Optional<Etudiant> profOpt = etudiantDao.findByEmail(emailProf);

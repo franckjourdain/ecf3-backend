@@ -42,48 +42,8 @@ public class EtudiantService {
         }
     }
 
-    // Initialiser des étudiants en BDD au lancement de l'application
-
     public void initialiserEtudiants() {
-        Optional<Role> etudiantRoleOpt = roleRepository.findByNom("ETUDIANT");
-        Optional<Role> professeurRoleOpt = roleRepository.findByNom("PROFESSEUR");
-        Optional<Role> adminRoleOpt = roleRepository.findByNom("ADMIN");
-
-        // Si au moins un rôle est manquant, on interrompt l'initialisation pour éviter une exception
-        if (etudiantRoleOpt.isEmpty() || professeurRoleOpt.isEmpty() || adminRoleOpt.isEmpty()) {
-            System.out.println("⚠️ Initialisation annulée : un ou plusieurs rôles sont manquants en base.");
-            return;
-        }
-
-        Role etudiantRole = etudiantRoleOpt.get();
-        Role professeurRole = professeurRoleOpt.get();
-        Role adminRole = adminRoleOpt.get();
-
-        // Étudiants avec le rôle "ETUDIANT"
-        creerEtudiantSiAbsent("Gueguen", "Yvon", "yvon.gueguen@gmail.com", "0001", etudiantRole);
-        creerEtudiantSiAbsent("Cadiou", "Pierre", "pierre.cadiou@gmail.com", "0002", etudiantRole);
-        creerEtudiantSiAbsent("Corre", "Jacques", "jacques.corre@gmail.com", "0003", etudiantRole);
-        creerEtudiantSiAbsent("Smith", "Paul", "paul.smith@gmail.com", "0004", etudiantRole);
-        creerEtudiantSiAbsent("Moulin", "Marie", "marie.moulin@gmail.com", "0005", etudiantRole);
-        creerEtudiantSiAbsent("Jacopin", "Helène", "helene.jacopin@gmail.com", "0006", etudiantRole);
-        creerEtudiantSiAbsent("Troadec", "Jeanne", "jeanne.troadec@gmail.com", "0007", etudiantRole);
-        creerEtudiantSiAbsent("Jacopin", "Vincent", "vincent.jacopin@gmail.com", "0008", etudiantRole);
-        creerEtudiantSiAbsent("Jestin", "Pauline", "pauline.jestin@gmail.com", "0009", etudiantRole);
-        creerEtudiantSiAbsent("Carnac", "Jennifer", "jennifer.carnac@gmail.com", "0010", etudiantRole);
-        creerEtudiantSiAbsent("Mazé", "Sarah", "sarah.mazé@gmail.com", "0011", etudiantRole);
-        creerEtudiantSiAbsent("Bacuet", "Matthieu", "matthieu.bacuet@gmail.com", "0012", etudiantRole);
-
-        // Professeurs avec le rôle "PROFESSEUR"
-        creerEtudiantSiAbsent("Dupont", "Jean", "jean.dupont@poudlard.com", "1001", professeurRole);
-        creerEtudiantSiAbsent("Micheline", "Jeanne", "jeanne.micheline@poudlard.com", "1002", professeurRole);
-        creerEtudiantSiAbsent("Smith", "Mickael", "mickael.smith@poudlard.com", "1003", professeurRole);
-        creerEtudiantSiAbsent("Dufour", "Eric", "eric.dufour@poudlard.com", "1004", professeurRole);
-        creerEtudiantSiAbsent("Abgrall", "François", "francois.abgrall@poudlard.com", "1005", professeurRole);
-        creerEtudiantSiAbsent("Cavarec", "Jam", "jam.cavarec@poudlard.com", "1006", professeurRole);
-        creerEtudiantSiAbsent("Tanguy", "René", "rene.tanguy@poudlard.com", "1007", professeurRole);
-
-        // Administrateur avec le rôle "ADMIN"
-        creerEtudiantSiAbsent("Admin", "Super", "admin@poudlard.com", "root", adminRole);
+        // Méthode obsolète : l'initialisation des étudiants est désormais gérée dans DataInitializer
     }
 
 
