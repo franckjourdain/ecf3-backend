@@ -18,8 +18,10 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
+                // Lancement des tests avec couverture
                 sh './mvnw clean verify'
-                //GÉNÉRATION FORCÉE du rapport XML après les tests
+
+                //  Étape CRUCIALE pour générer jacoco.xml
                 sh './mvnw jacoco:report'
             }
         }
