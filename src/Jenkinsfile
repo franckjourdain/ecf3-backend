@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'
+        maven 'Maven3' // défini dans Jenkins > Global Tool Configuration
     }
 
     environment {
-        SONARQUBE_ENV = 'SonarQube'
+        SONARQUBE_ENV = 'SonarQube' // nom défini dans Jenkins > SonarQube servers
     }
 
     stages {
@@ -18,10 +18,10 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                // Lancement des tests avec couverture
+                // Tests unitaires + fichier jacoco.exec
                 sh './mvnw clean verify'
 
-                //  Étape CRUCIALE pour générer jacoco.xml
+                //  Étape indispensable : génère le fichier jacoco.xml
                 sh './mvnw jacoco:report'
             }
         }
