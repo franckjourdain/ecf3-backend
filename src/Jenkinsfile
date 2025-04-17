@@ -28,11 +28,11 @@ pipeline {
             }
         }
 
-        stage('Coverage') {
-            steps {
-                sh './mvnw jacoco:report'
-            }
-        }
+       stage('Coverage') {
+           steps {
+               sh './mvnw verify'
+           }
+       }
 
         stage('SonarQube Analysis') {
             steps {
