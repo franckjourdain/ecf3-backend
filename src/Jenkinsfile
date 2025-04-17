@@ -34,7 +34,11 @@ pipeline {
                 sh './mvnw verify'
             }
         }
-
+        stage('Debug Jacoco') {
+            steps {
+                sh 'ls -al target/site/jacoco || echo "Pas de rapport trouvé"'
+            }
+        }
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
