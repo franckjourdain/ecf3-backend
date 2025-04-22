@@ -79,8 +79,8 @@ class CoursServiceTest {
     @Test
     void testCreateCours_AlreadyExists() {
         Cours cours = new Cours();
-        cours.setIdCours(1L);
-        when(coursDao.findById(1L)).thenReturn(Optional.of(cours));
+        cours.setRef("POTIONS");
+        when(coursDao.existsByRef("POTIONS")).thenReturn(true);
 
         assertThatThrownBy(() -> coursService.createCours(cours))
                 .isInstanceOf(IllegalArgumentException.class)

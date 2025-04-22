@@ -59,8 +59,7 @@ public class CoursService {
     }
 
     public void createCours(Cours cours) {
-        Optional<Cours> existing = coursDao.findById(cours.getIdCours());
-        if (existing.isPresent()) {
+        if (cours.getRef() != null && coursDao.existsByRef(cours.getRef())) {
             throw new IllegalArgumentException("Ce cours existe déjà");
         }
         coursDao.save(cours);

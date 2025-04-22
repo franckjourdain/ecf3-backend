@@ -72,10 +72,10 @@ public class EtudiantService {
     }
 
     public Etudiant ajouterEtudiant(Etudiant etudiant) {
-        if (!etudiantDao.existsById(etudiant.getIdEtudiant())) {
-            return etudiantDao.save(etudiant);
+        if (etudiant.getIdEtudiant() != null && etudiantDao.existsById(etudiant.getIdEtudiant())) {
+            throw new IllegalArgumentException("Cet étudiant existe déjà !");
         }
-        throw new IllegalArgumentException("Cet étudiant existe déjà !");
+        return etudiantDao.save(etudiant);
     }
 
     public Etudiant modifierEtudiant(Etudiant etudiantModifie) {

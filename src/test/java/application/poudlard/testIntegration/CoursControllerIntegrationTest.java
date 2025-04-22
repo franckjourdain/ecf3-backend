@@ -134,15 +134,16 @@ public class CoursControllerIntegrationTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testAjouterCours_shouldCreateNewCours() throws Exception {
-        Etudiant prof = etudiantDAO.findByEmail("prof2@test.com").orElseGet(() -> {
-            Etudiant p = new Etudiant();
-            p.setNom("Professeur2");
-            p.setPrenom("Test2");
-            p.setEmail("prof2@test.com");
-            p.setMotDePasse("test123");
-            p.setRole(roleRepository.findByNom("PROFESSEUR").orElseThrow());
-            return etudiantDAO.save(p);
-        });
+        Etudiant prof = etudiantDAO.findByEmail("prof2@test.com")
+                .orElseGet(() -> {
+                    Etudiant p = new Etudiant();
+                    p.setNom("Professeur2");
+                    p.setPrenom("Test2");
+                    p.setEmail("prof2@test.com");
+                    p.setMotDePasse("test123");
+                    p.setRole(roleRepository.findByNom("PROFESSEUR").orElseThrow());
+                    return etudiantDAO.save(p);
+                });
 
         Cours cours = new Cours();
         cours.setIntitule("Sortilèges");
@@ -158,6 +159,7 @@ public class CoursControllerIntegrationTest {
         List<Cours> coursList = coursDAO.findAll();
         assertThat(coursList).anyMatch(c -> c.getRef().equals("SORT") && c.getIntitule().equals("Sortilèges"));
     }
+
 
     @Test
     void testGetCoursById_shouldReturnCours() throws Exception {
