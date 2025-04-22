@@ -51,6 +51,10 @@ public class NoteService {
     }
 
     public Note ajouterNotePourEtudiantDansCours(Long idCours, Long idEtudiant, Note note) {
+        if (note.getValeur() < 0 || note.getValeur() > 20) {
+            throw new IllegalArgumentException(" La note doit être comprise entre 0 et 20.");
+        }
+
         Cours cours = validerCours(idCours);
         Etudiant etudiant = validerEtudiant(idEtudiant);
         note.setCours(cours);
@@ -59,11 +63,16 @@ public class NoteService {
     }
 
     public Note modifierNote(Note noteModifie) {
+        if (noteModifie.getValeur() < 0 || noteModifie.getValeur() > 20) {
+            throw new IllegalArgumentException(" La note doit être comprise entre 0 et 20.");
+        }
+
         Note note = noteDao.findById(noteModifie.getIdNote())
                 .orElseThrow(() -> new IllegalArgumentException("Note non trouvée"));
         copierProprietes(noteModifie, note);
         return noteDao.save(note);
     }
+
 
     public void supprimerNote(Note note) {
         noteDao.delete(note);

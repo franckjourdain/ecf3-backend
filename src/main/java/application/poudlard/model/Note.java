@@ -30,7 +30,7 @@ public class Note {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cours_id", nullable = false)
-    @JsonIgnore
+    @JsonBackReference
     private Cours cours;
 
     public Note(String intitule, double valeur, Cours cours, Etudiant etudiant){

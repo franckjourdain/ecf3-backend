@@ -132,5 +132,8 @@ public class EtudiantService {
                 .distinct() // pour éviter les doublons si un étudiant est dans plusieurs cours du prof
                 .toList();
     }
+    public Optional<Etudiant> getByEmail(String email) {
+        return etudiantDao.findByEmail(email);
+    }
 
 }

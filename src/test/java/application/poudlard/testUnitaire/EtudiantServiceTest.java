@@ -52,8 +52,8 @@ class EtudiantServiceTest {
     @Test
     void testAjouterEtudiant_Success() {
         Etudiant etudiant = new Etudiant();
-        etudiant.setIdEtudiant(1);
-        when(etudiantDao.existsById(1)).thenReturn(false);
+        etudiant.setIdEtudiant(1L);
+        when(etudiantDao.existsById(1L)).thenReturn(false);
         when(etudiantDao.save(etudiant)).thenReturn(etudiant);
 
         Etudiant result = etudiantService.ajouterEtudiant(etudiant);
@@ -63,8 +63,8 @@ class EtudiantServiceTest {
     @Test
     void testAjouterEtudiant_AlreadyExists() {
         Etudiant etudiant = new Etudiant();
-        etudiant.setIdEtudiant(1);
-        when(etudiantDao.existsById(1)).thenReturn(true);
+        etudiant.setIdEtudiant(1L);
+        when(etudiantDao.existsById(1L)).thenReturn(true);
 
         assertThatThrownBy(() -> etudiantService.ajouterEtudiant(etudiant))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -73,15 +73,15 @@ class EtudiantServiceTest {
 
     @Test
     void testSupprimerEtudiant_Success() {
-        when(etudiantDao.existsById(1)).thenReturn(true);
-        etudiantService.supprimerEtudiant(1);
-        verify(etudiantDao, times(1)).deleteById(1);
+        when(etudiantDao.existsById(1L)).thenReturn(true);
+        etudiantService.supprimerEtudiant(1L);
+        verify(etudiantDao, times(1)).deleteById(1L);
     }
 
     @Test
     void testSupprimerEtudiant_NotFound() {
-        when(etudiantDao.existsById(1)).thenReturn(false);
-        assertThatThrownBy(() -> etudiantService.supprimerEtudiant(1))
+        when(etudiantDao.existsById(1L)).thenReturn(false);
+        assertThatThrownBy(() -> etudiantService.supprimerEtudiant(1L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Etudiant non trouvé");
     }
@@ -89,15 +89,15 @@ class EtudiantServiceTest {
     @Test
     void testModifierEtudiant() {
         Etudiant existant = new Etudiant();
-        existant.setIdEtudiant(1);
+        existant.setIdEtudiant(1L);
 
         Etudiant modifie = new Etudiant();
-        modifie.setIdEtudiant(1);
+        modifie.setIdEtudiant(1L);
         modifie.setNom("Dupont");
         modifie.setPrenom("Jean");
         modifie.setNotes(List.of(new Note()));
 
-        when(etudiantDao.findById(1)).thenReturn(Optional.of(existant));
+        when(etudiantDao.findById(1L)).thenReturn(Optional.of(existant));
         when(etudiantDao.save(existant)).thenReturn(existant);
 
         Etudiant result = etudiantService.modifierEtudiant(modifie);
@@ -107,27 +107,27 @@ class EtudiantServiceTest {
 
     @Test
     void testGetEtudiantsByCours_Empty() {
-        when(etudiantDao.findEtudiantsByCours(1)).thenReturn(Collections.emptyList());
+        when(etudiantDao.findEtudiantsByCours(1L)).thenReturn(Collections.emptyList());
 
-        assertThatThrownBy(() -> etudiantService.getEtudiantsByCours(1))
+        assertThatThrownBy(() -> etudiantService.getEtudiantsByCours(1L))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Cours inexistant");
+                .hasMessageContaining("Cours introuvable avec l'id");
     }
 
     @Test
     void testAjouterCoursAEtudiant() {
         Cours cours = new Cours();
-        cours.setIdCours(1);
+        cours.setIdCours(1L);
         cours.setEtudiants(new ArrayList<>());
 
         Etudiant etudiant = new Etudiant();
-        etudiant.setIdEtudiant(1);
+        etudiant.setIdEtudiant(1L);
         etudiant.setCours(new ArrayList<>());
 
-        when(etudiantDao.findById(1)).thenReturn(Optional.of(etudiant));
-        when(coursDao.findById(1)).thenReturn(Optional.of(cours));
+        when(etudiantDao.findById(1L)).thenReturn(Optional.of(etudiant));
+        when(coursDao.findById(1L)).thenReturn(Optional.of(cours));
 
-        etudiantService.ajouterCoursAEtudiant(1, List.of(1));
+        etudiantService.ajouterCoursAEtudiant(1L, List.of(1L));
 
         assertThat(etudiant.getCours()).contains(cours);
         assertThat(cours.getEtudiants()).contains(etudiant);

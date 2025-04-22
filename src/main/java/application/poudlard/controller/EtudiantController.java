@@ -2,6 +2,7 @@ package application.poudlard.controller;
 
 import application.poudlard.dao.EtudiantDAO;
 import application.poudlard.dao.NoteDAO;
+import application.poudlard.dto.NoteDTO;
 import application.poudlard.model.Cours;
 import application.poudlard.model.Etudiant;
 import application.poudlard.model.Note;
@@ -24,14 +25,10 @@ public class EtudiantController {
 
     private final EtudiantService etudiantService;
     private final NoteService noteService;
-    private final EtudiantDAO etudiantDAO;
-    private final NoteDAO noteDAO;
 
-    public EtudiantController(EtudiantService etudiantService, NoteService noteService, EtudiantDAO etudiantDAO, NoteDAO noteDAO) {
+    public EtudiantController(EtudiantService etudiantService, NoteService noteService) {
         this.etudiantService = etudiantService;
         this.noteService = noteService;
-        this.etudiantDAO = etudiantDAO;
-        this.noteDAO = noteDAO;
     }
 
     @GetMapping("/all")
@@ -97,20 +94,29 @@ public class EtudiantController {
     @GetMapping("/me")
     public ResponseEntity<Etudiant> getMonProfil(Authentication authentication) {
         String email = authentication.getName(); // récupère l'email depuis le token JWT
-        Optional<Etudiant> etudiant = etudiantDAO.findByEmail(email);
+        Optional<Etudiant> etudiant = etudiantService.getByEmail(email);
         return etudiant.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     @GetMapping("/me/notes")
     @PreAuthorize("hasAnyRole('ETUDIANT', 'PROFESSEUR', 'ADMIN')")
-    public ResponseEntity<List<Note>> getMesNotes(Authentication authentication) {
+    public ResponseEntity<List<NoteDTO>> getMesNotes(Authentication authentication) {
         String email = authentication.getName();
-        Optional<Etudiant> etudiantOpt = etudiantDAO.findByEmail(email);
+        Optional<Etudiant> etudiantOpt = etudiantService.getByEmail(email);
         if (etudiantOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         Etudiant etudiant = etudiantOpt.get();
-        return ResponseEntity.ok(etudiant.getNotes());
+        List<NoteDTO> notesDTO = etudiant.getNotes().stream()
+                .map(note -> new NoteDTO(
+                        note.getIdNote(),
+                        note.getValeur(),
+                        note.getIntitule(),
+                        note.getCours() != null ? note.getCours().getIntitule() : "Cours inconnu"
+                ))
+                .toList();
+
+        return ResponseEntity.ok(notesDTO);
     }
 }

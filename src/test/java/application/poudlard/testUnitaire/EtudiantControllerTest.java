@@ -54,7 +54,7 @@ public class EtudiantControllerTest {
     @Test
     void testAjouterEtudiant_shouldReturnCreatedEtudiant() throws Exception {
         Etudiant mockEtudiant = new Etudiant();
-        mockEtudiant.setIdEtudiant(1);
+        mockEtudiant.setIdEtudiant(1L); // Changement ici
         mockEtudiant.setNom("Harry Potter");
 
         Mockito.when(etudiantService.ajouterEtudiant(Mockito.any(Etudiant.class))).thenReturn(mockEtudiant);
@@ -70,20 +70,21 @@ public class EtudiantControllerTest {
     @Test
     void testGetEtudiantById_shouldReturnEtudiant() throws Exception {
         Etudiant mockEtudiant = new Etudiant();
-        mockEtudiant.setIdEtudiant(2);
+        mockEtudiant.setIdEtudiant(2L); // Changement ici
         mockEtudiant.setNom("Hermione Granger");
 
-        Mockito.when(etudiantService.getEtudiant(2)).thenReturn(mockEtudiant);
+        Mockito.when(etudiantService.getEtudiant(2L)).thenReturn(mockEtudiant); // Changement ici
 
         mockMvc.perform(get("/poudlard/etudiant/2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.idEtudiant").value(2))
                 .andExpect(jsonPath("$.nom").value("Hermione Granger"));
     }
+
     @Test
     void testModifierEtudiant_shouldReturnUpdatedEtudiant() throws Exception {
         Etudiant etudiantModifie = new Etudiant();
-        etudiantModifie.setIdEtudiant(1);
+        etudiantModifie.setIdEtudiant(1L); // Changement ici
         etudiantModifie.setNom("Neville Londubat");
 
         Mockito.when(etudiantService.modifierEtudiant(Mockito.any(Etudiant.class))).thenReturn(etudiantModifie);
@@ -98,7 +99,7 @@ public class EtudiantControllerTest {
 
     @Test
     void testSupprimerEtudiant_shouldReturnNoContent() throws Exception {
-        Mockito.doNothing().when(etudiantService).supprimerEtudiant(1);
+        Mockito.doNothing().when(etudiantService).supprimerEtudiant(1L); // Changement ici
 
         mockMvc.perform(delete("/poudlard/etudiant/1"))
                 .andExpect(status().isNoContent());

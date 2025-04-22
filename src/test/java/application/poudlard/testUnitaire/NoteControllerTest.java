@@ -69,7 +69,6 @@ public class NoteControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
-                          "idNote": 1,
                           "valeur": 16.0
                         }
                         """))
