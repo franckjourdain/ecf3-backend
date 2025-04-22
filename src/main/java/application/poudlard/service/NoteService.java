@@ -19,21 +19,21 @@ public class NoteService {
     private final CoursDAO coursDAO;
     private final EtudiantDAO etudiantDao;
 
-    public NoteService(NoteDAO noteDAO, CoursDAO coursDAO, EtudiantDAO etudiantDao) {
-        this.noteDao = noteDAO;
+    public NoteService(NoteDAO noteDao, CoursDAO coursDAO, EtudiantDAO etudiantDao) {
+        this.noteDao = noteDao;
         this.coursDAO = coursDAO;
         this.etudiantDao = etudiantDao;
     }
 
-    public List<Note> getNotesByCours(int idCours) {
+    public List<Note> getNotesByCours(Long idCours) {
         return noteDao.findNotesByCours(idCours);
     }
 
-    public List<Note> getNotesByEtudiant(int idEtudiant) {
+    public List<Note> getNotesByEtudiant(Long idEtudiant) {
         return noteDao.findNotesByEtudiant(idEtudiant);
     }
 
-    public List<Note> getNotesByEtudiantAndCours(int etudiantId, int coursId) {
+    public List<Note> getNotesByEtudiantAndCours(Long etudiantId, Long coursId) {
         return noteDao.findNotesByEtudiantAndCours(etudiantId, coursId);
     }
 
@@ -42,19 +42,15 @@ public class NoteService {
             throw new IllegalArgumentException("Cette note existe déjà");
         }
 
-        // 🔍 Récupérer l'étudiant connecté
         String email = authentication.getName();
         Etudiant etudiant = etudiantDao.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Étudiant non trouvé avec l'email : " + email));
 
-        // 🔗 Lier l'étudiant à la note
         note.setEtudiant(etudiant);
-
-        // 💾 Sauvegarder la note
         noteDao.save(note);
     }
 
-    public Note ajouterNotePourEtudiantDansCours(int idCours, int idEtudiant, Note note) {
+    public Note ajouterNotePourEtudiantDansCours(Long idCours, Long idEtudiant, Note note) {
         Cours cours = validerCours(idCours);
         Etudiant etudiant = validerEtudiant(idEtudiant);
         note.setCours(cours);
@@ -73,12 +69,12 @@ public class NoteService {
         noteDao.delete(note);
     }
 
-    private Cours validerCours(int idCours) {
+    private Cours validerCours(Long idCours) {
         return coursDAO.findById(idCours)
                 .orElseThrow(() -> new IllegalArgumentException("Ce cours n'existe pas"));
     }
 
-    private Etudiant validerEtudiant(int idEtudiant) {
+    private Etudiant validerEtudiant(Long idEtudiant) {
         return etudiantDao.findById(idEtudiant)
                 .orElseThrow(() -> new IllegalArgumentException("Cet étudiant n'existe pas"));
     }
@@ -90,12 +86,12 @@ public class NoteService {
         cible.setIntitule(source.getIntitule());
     }
 
-    public Note getNoteById(int id) {
+    public Note getNoteById(Long id) {
         return noteDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Note non trouvée avec id : " + id));
     }
 
     public Note ajouterNote(Note note) {
-        return note;
+        return noteDao.save(note);
     }
 }

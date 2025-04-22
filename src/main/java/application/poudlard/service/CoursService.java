@@ -20,65 +20,37 @@ public class CoursService {
     private static final String COURS_INTROUVABLE = "Cours non trouvé";
     private static final String ETUDIANT_INTROUVABLE = "Etudiant not found with id: ";
 
-    public CoursService(CoursDAO coursDao, EtudiantDAO etudiantDAO) {
+    public CoursService(CoursDAO coursDao, EtudiantDAO etudiantDao) {
         this.coursDao = coursDao;
-        this.etudiantDao = etudiantDAO;
+        this.etudiantDao = etudiantDao;
     }
+
     public List<Cours> getCoursByProfesseur(String emailProfesseur) {
         Etudiant professeur = etudiantDao.findByEmail(emailProfesseur)
-                .orElseThrow(() -> new IllegalArgumentException("Professeur non trouvé avec email : " + emailProfesseur));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Professeur non trouvé avec email : " + emailProfesseur));
 
-        if (!"PROFESSEUR".equals(professeur.getRole().getNom())) {
+        if (professeur.getRole() == null || !"PROFESSEUR".equals(professeur.getRole().getNom())) {
             throw new IllegalArgumentException("L'utilisateur n'est pas un professeur");
         }
 
         return coursDao.findAll().stream()
-                .filter(cours -> cours.getProfesseur() != null && cours.getProfesseur().getEmail().equals(emailProfesseur))
+                .filter(c -> c.getProfesseur() != null
+                        && emailProfesseur.equals(c.getProfesseur().getEmail()))
                 .toList();
     }
-    private void creerCoursSiAbsent(String intitule, String ref, String emailProfesseur, boolean option) {
-        if (!coursDao.existsByRef(ref)) {
-            Etudiant professeur = etudiantDao.findByEmail(emailProfesseur)
-                    .orElseThrow(() -> new IllegalArgumentException("Professeur non trouvé avec email : " + emailProfesseur));
 
-            if (!"PROFESSEUR".equals(professeur.getRole().getNom())) {
-                throw new IllegalArgumentException("L'utilisateur avec email " + emailProfesseur + " n'est pas un professeur");
-            }
-
-            Cours cours = new Cours();
-            cours.setIntitule(intitule);
-            cours.setRef(ref);
-            cours.setEstOptionnel(true);
-            cours.setProfesseur(professeur);
-            coursDao.save(cours);
-        }
-    }
-    public void initialiserCours() {
-        // Données initiales déplacées dans DataInitializer
-    }
-
-
-    private void ajouterCoursSiProfExiste(String nom, String code, String emailProf, boolean obligatoire) {
-        Optional<Etudiant> profOpt = etudiantDao.findByEmail(emailProf);
-        if (profOpt.isPresent()) {
-            creerCoursSiAbsent(nom, code, emailProf, obligatoire);
-        } else {
-            System.out.println("⚠️ Professeur introuvable pour le cours '" + nom + "' (" + emailProf + "). Cours non créé.");
-        }
-    }
-
-    // Méthodes utilitaires pour réduire le code dupliqué
-    private Cours findCoursByIdOrThrow(int id) {
+    private Cours findCoursByIdOrThrow(Long id) {
         return coursDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(COURS_INTROUVABLE));
     }
 
-    private Etudiant findEtudiantByIdOrThrow(int id) {
+    private Etudiant findEtudiantByIdOrThrow(Long id) {
         return etudiantDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ETUDIANT_INTROUVABLE + id));
     }
 
-    public Cours getCoursById(int id) {
+    public Cours getCoursById(Long id) {
         return findCoursByIdOrThrow(id);
     }
 
@@ -87,50 +59,40 @@ public class CoursService {
     }
 
     public void createCours(Cours cours) {
-        Optional<Cours> optionalCours = coursDao.findById(cours.getIdCours());
-        if (optionalCours.isPresent()) {
+        Optional<Cours> existing = coursDao.findById(cours.getIdCours());
+        if (existing.isPresent()) {
             throw new IllegalArgumentException("Ce cours existe déjà");
         }
         coursDao.save(cours);
     }
 
     public Cours updateCours(Cours cours) {
-        Cours existingCours = findCoursByIdOrThrow(cours.getIdCours());
-        existingCours.setIntitule(cours.getIntitule());
-        existingCours.setRef(cours.getRef());
-        existingCours.setEtudiants(cours.getEtudiants());
-        existingCours.setNotes(cours.getNotes());
-
-        return coursDao.save(existingCours);
+        Cours existing = findCoursByIdOrThrow(cours.getIdCours());
+        existing.setIntitule(cours.getIntitule());
+        existing.setRef(cours.getRef());
+        existing.setEstOptionnel(cours.isEstOptionnel());
+        existing.setProfesseur(cours.getProfesseur());
+        existing.setEtudiants(cours.getEtudiants());
+        existing.setNotes(cours.getNotes());
+        return coursDao.save(existing);
     }
 
-    public void supprimerCours(int idCours) {
-        Cours cours = findCoursByIdOrThrow(idCours);
+    public void supprimerCours(Long id) {
+        Cours cours = findCoursByIdOrThrow(id);
         coursDao.delete(cours);
     }
 
-    public List<Etudiant> ajouterEtudiantsAuCours(int idCours, List<Integer> idEtudiants) {
+    public List<Etudiant> ajouterEtudiantsAuCours(Long idCours, List<Long> idEtudiants) {
         Cours cours = findCoursByIdOrThrow(idCours);
-
-        for (int idEtudiant : idEtudiants) {
-            Etudiant etudiant = findEtudiantByIdOrThrow(idEtudiant);
-
-            if (!cours.getEtudiants().contains(etudiant)) {
-                cours.getEtudiants().add(etudiant);
-
-
-                if (etudiant.getCours() == null) {
-                    etudiant.setCours(new ArrayList<>());
-                }
-
-                etudiant.getCours().add(cours);
+        for (Long idEtudiant : idEtudiants) {
+            Etudiant etu = findEtudiantByIdOrThrow(idEtudiant);
+            if (!cours.getEtudiants().contains(etu)) {
+                cours.getEtudiants().add(etu);
+                etu.getCours().add(cours);
             }
         }
-
         coursDao.save(cours);
         etudiantDao.saveAll(cours.getEtudiants());
-
         return new ArrayList<>(cours.getEtudiants());
     }
-
 }

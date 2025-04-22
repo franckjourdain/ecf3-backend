@@ -52,19 +52,20 @@ public class EtudiantService {
         return etudiantDao.findAll();
     }
 
-    public Etudiant getEtudiant(int id) {
+    public Etudiant getEtudiant(long id) {
         return etudiantDao.findById(id).orElseThrow(() -> new IllegalArgumentException(ETUDIANT_NON_TROUVE));
     }
 
-    public List<Etudiant> getEtudiantsByCours(int idCours) {
-        List<Etudiant> etudiants = etudiantDao.findEtudiantsByCours(idCours);
-        if (etudiants.isEmpty()) {
-            throw new IllegalArgumentException("Cours inexistant ou aucun étudiant trouvé pour le cours avec id: " + idCours);
-        }
-        return etudiants;
+    public List<Etudiant> getEtudiantsByCours(long idCours) {
+        // Vérifie que le cours existe — sinon exception claire
+        coursDao.findById(idCours)
+                .orElseThrow(() -> new IllegalArgumentException("Cours introuvable avec l'id: " + idCours));
+
+        // Récupère les étudiants, même si la liste est vide (pas une erreur côté front)
+        return etudiantDao.findEtudiantsByCours(idCours);
     }
 
-    public List<Cours> getCoursByEtudiant(int idEtudiant) {
+    public List<Cours> getCoursByEtudiant(long idEtudiant) {
         return etudiantDao.findById(idEtudiant)
                 .map(Etudiant::getCours)
                 .orElseThrow(() -> new IllegalArgumentException(ETUDIANT_NON_TROUVE));
@@ -91,18 +92,18 @@ public class EtudiantService {
         return etudiantDao.save(etudiantExistant);
     }
 
-    public void supprimerEtudiant(int idEtudiant) {
+    public void supprimerEtudiant(long idEtudiant) {
         if (!etudiantDao.existsById(idEtudiant)) {
             throw new IllegalArgumentException(ETUDIANT_NON_TROUVE);
         }
         etudiantDao.deleteById(idEtudiant);
     }
 
-    public List<Note> consulterNotes(int etudiantId) {
+    public List<Note> consulterNotes(long etudiantId) {
         return etudiantDao.getNotes(etudiantId);
     }
 
-    public void ajouterCoursAEtudiant(int idEtudiant, List<Integer> idCoursList) {
+    public void ajouterCoursAEtudiant(long idEtudiant, List<Long> idCoursList) {
         Etudiant etudiant = etudiantDao.findById(idEtudiant)
                 .orElseThrow(() -> new IllegalArgumentException(ETUDIANT_NON_TROUVE));
 

@@ -12,23 +12,26 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Note {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idNote;
+    @Column(name = "id_note")
+    private Long idNote;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cours_id", nullable = false)
-    @JsonBackReference
-    private Cours cours;
+    @Column(name = "valeur")
+    private double valeur;
 
     private String intitule;
-
-    private double valeur;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "etudiant_id", nullable = false)
     @JsonIgnore
     private Etudiant etudiant;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cours_id", nullable = false)
+    @JsonIgnore
+    private Cours cours;
 
     public Note(String intitule, double valeur, Cours cours, Etudiant etudiant){
         this.intitule = intitule;

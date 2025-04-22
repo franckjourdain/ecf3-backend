@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface CoursDAO extends JpaRepository<Cours, Integer> {
+public interface CoursDAO extends JpaRepository<Cours, Long> {
     boolean existsByRef(String ref);
-
 }

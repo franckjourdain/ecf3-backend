@@ -1,6 +1,7 @@
 package application.poudlard.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.Id;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class Cours {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cours")
-    private int idCours;
+    private Long idCours;
     private String intitule;
     private String ref;
     @ManyToOne
@@ -29,10 +30,9 @@ public class Cours {
     private boolean estOptionnel;
 
 
-    @OneToMany(mappedBy = "cours")
-    @JsonIgnore
-    private List<Note> notes= new ArrayList<>();
-
+    @OneToMany(mappedBy = "cours", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Note> notes = new ArrayList<>();
     @ManyToMany
     @JoinTable(
             name = "etudiant_cours",
@@ -48,7 +48,7 @@ public class Cours {
     }
 
     public Cours(int coursId, String intitule, String ref) {
-        this.idCours = coursId;
+        this.idCours = (long) coursId;
         this.intitule = intitule;
         this.ref = ref;
     }

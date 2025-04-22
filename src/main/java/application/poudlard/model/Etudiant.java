@@ -19,9 +19,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Etudiant {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idEtudiant;
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ @Column(name = "id_etudiant")
+ private Long idEtudiant;
     private String nom;
     private String prenom;
     @Column(unique = true)

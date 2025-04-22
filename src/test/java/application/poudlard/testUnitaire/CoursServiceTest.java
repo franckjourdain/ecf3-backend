@@ -12,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -46,19 +48,19 @@ class CoursServiceTest {
     @Test
     void testGetCoursById_Success() {
         Cours cours = new Cours();
-        cours.setIdCours(1);
-        when(coursDao.findById(1)).thenReturn(Optional.of(cours));
+        cours.setIdCours(1L);
+        when(coursDao.findById(1L)).thenReturn(Optional.of(cours));
 
-        Cours result = coursService.getCoursById(1);
+        Cours result = coursService.getCoursById(1L);
 
         assertThat(result).isEqualTo(cours);
     }
 
     @Test
     void testGetCoursById_NotFound() {
-        when(coursDao.findById(1)).thenReturn(Optional.empty());
+        when(coursDao.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> coursService.getCoursById(1))
+        assertThatThrownBy(() -> coursService.getCoursById(1L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Cours non trouvé");
     }
@@ -66,8 +68,8 @@ class CoursServiceTest {
     @Test
     void testCreateCours_Success() {
         Cours cours = new Cours();
-        cours.setIdCours(1);
-        when(coursDao.findById(1)).thenReturn(Optional.empty());
+        cours.setIdCours(1L);
+        when(coursDao.findById(1L)).thenReturn(Optional.empty());
 
         coursService.createCours(cours);
 
@@ -77,8 +79,8 @@ class CoursServiceTest {
     @Test
     void testCreateCours_AlreadyExists() {
         Cours cours = new Cours();
-        cours.setIdCours(1);
-        when(coursDao.findById(1)).thenReturn(Optional.of(cours));
+        cours.setIdCours(1L);
+        when(coursDao.findById(1L)).thenReturn(Optional.of(cours));
 
         assertThatThrownBy(() -> coursService.createCours(cours))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -88,9 +90,9 @@ class CoursServiceTest {
     @Test
     void testSupprimerCours() {
         Cours cours = new Cours();
-        when(coursDao.findById(1)).thenReturn(Optional.of(cours));
+        when(coursDao.findById(1L)).thenReturn(Optional.of(cours));
 
-        coursService.supprimerCours(1);
+        coursService.supprimerCours(1L);
 
         verify(coursDao).delete(cours);
     }
@@ -99,16 +101,16 @@ class CoursServiceTest {
     void testAjouterEtudiantsAuCours() {
         Cours cours = new Cours();
         cours.setEtudiants(new ArrayList<>());
-        cours.setIdCours(1);
+        cours.setIdCours(1L);
 
         Etudiant etu = new Etudiant();
-        etu.setIdEtudiant(2);
+        etu.setIdEtudiant(2L);
         etu.setCours(new ArrayList<>());
 
-        when(coursDao.findById(1)).thenReturn(Optional.of(cours));
-        when(etudiantDao.findById(2)).thenReturn(Optional.of(etu));
+        when(coursDao.findById(1L)).thenReturn(Optional.of(cours));
+        when(etudiantDao.findById(2L)).thenReturn(Optional.of(etu));
 
-        List<Etudiant> result = coursService.ajouterEtudiantsAuCours(1, List.of(2));
+        List<Etudiant> result = coursService.ajouterEtudiantsAuCours(1L, List.of(2L));
 
         assertThat(result).contains(etu);
         assertThat(etu.getCours()).contains(cours);

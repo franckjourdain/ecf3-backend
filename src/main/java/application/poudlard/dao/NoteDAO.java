@@ -9,14 +9,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface NoteDAO extends JpaRepository<Note, Integer> {
+public interface NoteDAO extends JpaRepository<Note, Long> {
 
     @Query("SELECT n FROM Note n WHERE n.cours.idCours = :idCours")
-    List<Note> findNotesByCours(@Param("idCours")int idCours);
+    List<Note> findNotesByCours(@Param("idCours") Long idCours);
 
-    @Query("SELECT n FROM Note n WHERE n.etudiant.idEtudiant =:idEtudiant")
-    List<Note> findNotesByEtudiant(@Param("idEtudiant") int idEtudiant);
+    @Query("SELECT n FROM Note n WHERE n.etudiant.idEtudiant = :idEtudiant")
+    List<Note> findNotesByEtudiant(@Param("idEtudiant") Long idEtudiant);
 
     @Query("SELECT n FROM Note n WHERE n.etudiant.idEtudiant = :etudiantId AND n.cours.idCours = :coursId")
-    List<Note> findNotesByEtudiantAndCours(@Param("etudiantId") int etudiantId, @Param("coursId") int coursId);
+    List<Note> findNotesByEtudiantAndCours(@Param("etudiantId") Long etudiantId, @Param("coursId") Long coursId);
+
+    @Query("SELECT n FROM Note n JOIN FETCH n.cours WHERE n.etudiant.idEtudiant = :idEtudiant")
+    List<Note> findNotesWithCoursByEtudiant(@Param("idEtudiant") Long idEtudiant);
 }

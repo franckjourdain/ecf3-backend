@@ -46,10 +46,10 @@ public class NoteControllerTest {
     @Test
     void testGetNoteById_shouldReturnNote() throws Exception {
         Note note = new Note();
-        note.setIdNote(1);
+        note.setIdNote(1L);
         note.setValeur(18.5);
 
-        when(noteService.getNoteById(1)).thenReturn(note);
+        when(noteService.getNoteById(1L)).thenReturn(note);
 
         mockMvc.perform(get("/classes/notes/1"))
                 .andExpect(status().isOk())
@@ -60,10 +60,10 @@ public class NoteControllerTest {
     @Test
     void testAjouterNotePourEtudiant_shouldReturnCreatedNote() throws Exception {
         Note note = new Note();
-        note.setIdNote(1);
+        note.setIdNote(1L);
         note.setValeur(16.0);
 
-        when(noteService.ajouterNotePourEtudiantDansCours(eq(1), eq(1), any(Note.class))).thenReturn(note);
+        when(noteService.ajouterNotePourEtudiantDansCours(eq(1L), eq(1L), any(Note.class))).thenReturn(note);
 
         mockMvc.perform(post("/classes/notes/cours/1/etudiants/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +81,7 @@ public class NoteControllerTest {
     @Test
     void testModifierNote_shouldReturnUpdatedNote() throws Exception {
         Note updatedNote = new Note();
-        updatedNote.setIdNote(1);
+        updatedNote.setIdNote(1L);
         updatedNote.setValeur(19.0);
 
         when(noteService.modifierNote(any(Note.class))).thenReturn(updatedNote);
@@ -102,9 +102,9 @@ public class NoteControllerTest {
     @Test
     void testSupprimerNote_shouldReturnNoContent() throws Exception {
         Note note = new Note();
-        note.setIdNote(1);
+        note.setIdNote(1L);
 
-        when(noteService.getNoteById(1)).thenReturn(note);
+        when(noteService.getNoteById(1L)).thenReturn(note);
 
         mockMvc.perform(delete("/classes/notes/1"))
                 .andExpect(status().isNoContent());
